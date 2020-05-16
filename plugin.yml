@@ -1,0 +1,9 @@
+name: DreamDeathswap
+version: ${project.version}
+main: me.prostedeni.goodcraft.dreamdeathswap.DreamDeathswap
+api-version: 1.13
+authors: [prosteDeni]
+description: plugin that allows you and your friend play a dangerous game of Deathswap. enjoy :))
+commands:
+  deathswap:
+    description: you can now play deathswap with your friends
