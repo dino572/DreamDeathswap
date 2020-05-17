@@ -98,18 +98,18 @@ public static int Time;
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("deathswap")) {
             if (((getConfig().getInt("Delay")) > 0) || ((getConfig().getInt("WarnTime")) > 0) || ((getConfig().getInt("SwapChance")) > 0 || (getConfig().getInt("SwapChance")) <= 100)){
-                if (sender instanceof Player) {
+                if (args[0].equalsIgnoreCase("reload")) {
+                    reloadConfig();
+                    getConfig();
+                    saveConfig();
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Config reloaded");
+                    System.out.println("config reloaded");
+                } else if (sender instanceof Player) {
                     if (sender.hasPermission("deathswap.use")) {
                         if (args.length == 1) {
 
                             if (args[0].equalsIgnoreCase("stop")) {
                                 running = false;
-                            } else if (args[0].equalsIgnoreCase("reload")) {
-                                reloadConfig();
-                                getConfig();
-                                saveConfig();
-                                sender.sendMessage(ChatColor.DARK_AQUA + "Config reloaded");
-                                System.out.println("config reloaded");
                             } else {
                                 String name = args[0];
                                 Player target = Bukkit.getPlayer(name);
