@@ -110,13 +110,11 @@ public static int Time;
                             if (args[0].equalsIgnoreCase("stop")) {
                                 running = false;
                             } else {
-                                String name = args[0];
-                                Player target = Bukkit.getPlayer(name);
-                                if (target == null) {
-                                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4Player " + name + " &4is offline"));
+                                if (Bukkit.getPlayer(args[0]) == null) {
+                                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4Player " + args[0] + " &4is offline"));
                                 } else {
                                     player1 = Bukkit.getPlayer(String.valueOf(sender));
-                                    player2 = Bukkit.getPlayer(name);
+                                    player2 = Bukkit.getPlayer(args[0]);
 
                                     player1.sendMessage(ChatColor.DARK_AQUA + "You have been put into Deathswap. Enjoy :)");
                                     player2.sendMessage(ChatColor.DARK_AQUA + "You have been put into Deathswap. Enjoy :)");
