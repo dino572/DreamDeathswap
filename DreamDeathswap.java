@@ -36,12 +36,11 @@ public static int Time;
     public void onDeath(PlayerDeathEvent d){
         String LastDead = d.getEntity().getName();
         if (LastDead.equals(String.valueOf(player1)) || LastDead.equals(String.valueOf(player2))){
-            String Loser = LastDead;
-            if (Loser.equals(String.valueOf(player1))) {
+            if (LastDead.equals(String.valueOf(player1))) {
                 player1.sendMessage(ChatColor.translateAlternateColorCodes('&',"&2&lPlayer &6&l" + player2 + " &2&lhas won"));
                 player2.sendMessage(ChatColor.translateAlternateColorCodes('&',"&2&lPlayer &6&l" + player2 + " &2&lhas won"));
             }
-            if (Loser.equals(String.valueOf(player2))){
+            if (LastDead.equals(String.valueOf(player2))){
                 player1.sendMessage(ChatColor.translateAlternateColorCodes('&',"&2&lPlayer &6&l" + player1 + " &2&lhas won"));
                 player2.sendMessage(ChatColor.translateAlternateColorCodes('&',"&2&lPlayer &6&l" + player1 + " &2&lhas won"));
             }
