@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -21,6 +22,15 @@ public static Player player1;
 public static Player player2;
 
 public static int Time;
+
+    @EventHandler
+    public void onNether(PlayerPortalEvent p){
+        boolean Nether = getConfig().getBoolean("Nether");
+        if (!Nether){
+            p.getPlayer().sendMessage(ChatColor.DARK_RED + "Nether has been disabled in the config");
+            p.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent d){
@@ -62,6 +72,10 @@ public static int Time;
 
                             int r = (int) (Math.random() * (100 - 0)) + 0;
                             int SwapChance = getConfig().getInt("SwapChance");
+
+                            if (getConfig().getBoolean("Debug")){
+                                System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " r: " + r + " SwapChance: " + SwapChance);
+                            }
 
                             if (r > SwapChance) {
                                 player1.teleport(loc2);
@@ -110,6 +124,9 @@ public static int Time;
                                     player2.sendMessage(ChatColor.DARK_AQUA + "You have been put into Deathswap. Enjoy :)");
 
                                     running = true;
+                                    if (getConfig().getBoolean("Debug")){
+                                        System.out.println("running: " + running);
+                                    }
                                 }
                             }
 
