@@ -1,3 +1,5 @@
-Delay: 50
+Delay: 360
 WarnTime: 10
 SwapChance: 100
+Nether: true
+Debug: false
