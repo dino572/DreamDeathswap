@@ -103,7 +103,6 @@ public static int Time;
                     getConfig();
                     saveConfig();
                     sender.sendMessage(ChatColor.DARK_AQUA + "Config reloaded");
-                    System.out.println("config reloaded");
                 } else if (sender instanceof Player) {
                     if (sender.hasPermission("deathswap.use")) {
                         if (args.length == 1) {
