@@ -12,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.Random;
 
 
 public final class DreamDeathswap extends JavaPlugin implements Listener {
@@ -22,6 +23,18 @@ public static Player player1;
 public static Player player2;
 
 public static int Time;
+
+public static int rando;
+
+    private static int getRandomNumberInRange(int min, int max) {
+
+        if (min >= max) {
+            throw new IllegalArgumentException("max must be greater than min");
+        }
+
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
 
     @EventHandler
     public void onNether(PlayerPortalEvent p){
@@ -48,52 +61,6 @@ public static int Time;
         }
     }
 
-    @EventHandler
-    public void onEvent(PlayerCommandSendEvent e){
-        if (e.getCommands().contains("deathswap")){
-            int Delay = getConfig().getInt("Delay");
-            int WarnTime = getConfig().getInt("WarnTime");
-            Time = 0;
-            if (running) {
-                Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-                    public void run() {
-                        Time = Time + 1;
-                        if ((Delay - Time) < WarnTime){
-                            player1.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cSwapping in " + (Delay - Time) + "&c seconds"));
-                            player2.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cSwapping in " + (Delay - Time) + "&c seconds"));
-                        }
-
-                        if (Delay - Time == 0){
-                            Time = 0;
-
-                            Location loc1 = player1.getLocation();
-                            Location loc2 = player2.getLocation();
-
-                            int r = (int) (Math.random() * (100 - 0)) + 0;
-                            int SwapChance = getConfig().getInt("SwapChance");
-
-                            if (getConfig().getBoolean("Debug")){
-                                System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " r: " + r + " SwapChance: " + SwapChance);
-                            }
-
-                            if (r > SwapChance) {
-                                player1.teleport(loc2);
-                                player2.teleport(loc1);
-
-                                player1.sendMessage(ChatColor.GREEN + "You have been swapped");
-                                player2.sendMessage(ChatColor.GREEN + "You have been swapped");
-                            }
-                            if (r <= SwapChance){
-                                player1.sendMessage(ChatColor.GREEN + "Swapping did not occur");
-                                player2.sendMessage(ChatColor.GREEN + "Swapping did not occur");
-                            }
-                        }
-                    }
-                }, 0, 20);
-            }
-        }
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("deathswap")) {
@@ -109,26 +76,72 @@ public static int Time;
 
                             if (args[0].equalsIgnoreCase("stop")) {
                                 running = false;
+                            } else if (args[0].equalsIgnoreCase("start")){
+                                int Delay = getConfig().getInt("Delay");
+                                int WarnTime = getConfig().getInt("WarnTime");
+                                Time = 0;
+                                if (running) {
+                                    Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+                                        public void run() {
+                                            Time = Time + 1;
+                                            if ((Delay - Time) <= WarnTime){
+                                                player1.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cSwapping in " + (Delay - Time) + "&c seconds"));
+                                                player2.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cSwapping in " + (Delay - Time) + "&c seconds"));
+                                            }
+
+                                            if (Delay - Time == 0){
+                                                Time = 0;
+
+                                                Location loc1 = player1.getLocation();
+                                                Location loc2 = player2.getLocation();
+
+                                                rando = getRandomNumberInRange(0, 100);
+
+                                                int SwapChance = getConfig().getInt("SwapChance");
+
+                                                if (getConfig().getBoolean("Debug")){
+                                                    System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " r: " + rando + " SwapChance: " + SwapChance);
+                                                }
+
+                                                if (rando > SwapChance) {
+                                                    player1.teleport(loc2);
+                                                    player2.teleport(loc1);
+
+                                                    player1.sendMessage(ChatColor.GREEN + "You have been swapped");
+                                                    player2.sendMessage(ChatColor.GREEN + "You have been swapped");
+                                                }
+                                                if (rando <= SwapChance){
+                                                    player1.sendMessage(ChatColor.GREEN + "Swapping did not occur");
+                                                    player2.sendMessage(ChatColor.GREEN + "Swapping did not occur");
+                                                }
+                                            }
+                                        }
+                                    }, 0, 20);
+                                } else {
+                                    sender.sendMessage(ChatColor.DARK_RED + "Players haven't been defined or previous game ended");
+                                }
                             } else {
                                 if (Bukkit.getPlayer(args[0]) == null) {
                                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4Player " + args[0] + " &4is offline"));
-                                } else {
+                                } else if (Bukkit.getPlayer(args[0]) != null){
+                                    if (Bukkit.getPlayer(args[0]) != sender){
                                     player1 = Bukkit.getPlayer(String.valueOf(sender));
-                                    player2 = Bukkit.getPlayer(args[0]);
+                                    player2 = Bukkit.getPlayer(String.valueOf(args[0]));
 
                                     player1.sendMessage(ChatColor.DARK_AQUA + "You have been put into Deathswap. Enjoy :)");
                                     player2.sendMessage(ChatColor.DARK_AQUA + "You have been put into Deathswap. Enjoy :)");
 
                                     running = true;
-                                    if (getConfig().getBoolean("Debug")){
+                                    if (getConfig().getBoolean("Debug")) {
                                         System.out.println("running: " + running);
+                                        }
+                                    } else {
+                                        sender.sendMessage(ChatColor.DARK_RED + "You can't swap with yourself");
                                     }
                                 }
                             }
 
                         } else if (args.length == 2) {
-                            sender.sendMessage(ChatColor.DARK_RED + "Invalid arguments");
-                        } else if (args.length == 0) {
                             sender.sendMessage(ChatColor.DARK_RED + "Invalid arguments");
                         }
 
