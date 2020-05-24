@@ -37,7 +37,16 @@ public static int rando;
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
     }
-
+    
+    @EventHandler
+    public void onQuit(PlayerQuitEvent q){
+        if (q.getPlayer().equals(player1) || q.getPlayer().equals(player2)){
+            if (running){
+                running = false;
+            }
+        }
+    }
+    
     @EventHandler
     public void onNether(PlayerPortalEvent p){
         if (p.getPlayer().equals(player1) || p.getPlayer().equals(player2)) {
