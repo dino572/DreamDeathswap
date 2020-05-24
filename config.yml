@@ -1,5 +1,6 @@
-Delay: 360
+Delay: 300
 WarnTime: 10
-SwapChance: 100
+AlternativeMode: false
+SwapChance: 50
 Nether: true
 Debug: false
