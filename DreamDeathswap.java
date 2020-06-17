@@ -89,10 +89,12 @@ public static boolean Debug;
             }
 
             if (playerMap.containsValue(died)){
-                getKey(died).sendMessage(DARK_GREEN + "You have won the deathswap!");
+                Player key = getKey(died);
+
+                key.sendMessage(DARK_GREEN + "You have won the deathswap!");
                 died.sendMessage(DARK_RED + "You have lost the deathswap!");
 
-                playerMap.remove(getKey(died));
+                playerMap.remove(key);
             }
     }
     //declares winner and ends deathswap
@@ -109,10 +111,14 @@ public static boolean Debug;
     //just a method i found on the internet for getting random numbers
 
     public Player getKey(Player player){
-        for (Player p : Bukkit.getOnlinePlayers()){
-            if (playerMap.get(p).equals(player)){
-                return p;
+        try {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (playerMap.get(p).equals(player)) {
+                    return p;
+                }
             }
+        } catch (NullPointerException e){
+            //just don't display it
         }
         return player;
     }
