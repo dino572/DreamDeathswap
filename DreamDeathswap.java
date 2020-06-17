@@ -69,14 +69,14 @@ public static boolean Debug;
     @EventHandler
     public void onNether(PlayerPortalEvent p){
         if (playerMap.containsKey(p.getPlayer()) || playerMap.containsValue(p.getPlayer())) {
-
-            boolean Nether = getConfig().getBoolean("Nether");
+            
             if (!Nether) {
                 p.getPlayer().sendMessage(DARK_RED + "Nether has been disabled in the config");
                 p.setCancelled(true);
             }
         }
     }
+    //this forbids players from entering Nether if it's disallowed
 
     @EventHandler
     public void onDeath(PlayerDeathEvent d){
@@ -95,6 +95,7 @@ public static boolean Debug;
                 playerMap.remove(getKey(died));
             }
     }
+    //declares winner and ends deathswap
 
     private static int getRandomNumberInRange(int min, int max) {
 
@@ -105,6 +106,7 @@ public static boolean Debug;
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
     }
+    //just a method i found on the internet for getting random numbers
 
     public Player getKey(Player player){
         for (Player p : Bukkit.getOnlinePlayers()){
@@ -114,7 +116,15 @@ public static boolean Debug;
         }
         return player;
     }
-
+    /*
+    this method gets key from value of hashmap, however, this is not very optimized
+    because it loops through every online player and asks if he is the key
+    optimally there would be two HashMaps, Key to Value and Value to Key
+    but that also uses up twice the RAM
+    
+    aditionally, this will break if there are more keys holding the same value
+    */
+    
     public void fetchConfig(){
         Delay = getConfig().getInt("Delay");
         WarnTime = getConfig().getInt("WarnTime");
@@ -124,6 +134,8 @@ public static boolean Debug;
         Nether = getConfig().getBoolean("Nether");
         Debug = getConfig().getBoolean("Debug");
     }
+    //this just gets config on startup or on reload, because accessing static variables
+    //is less resource taxing than getting the value from physical file every time
 
     public void startRunnable(Player p1, Player p2){
 
@@ -175,7 +187,7 @@ public static boolean Debug;
                         //if AlternativeMode == true, it calculates with chances
 
                         if (rando <= SwapChance) {
-                           
+
                             teleport(player1, player2, loc1, loc2);
 
                             player1.sendMessage(GREEN + "You have been swapped");
@@ -191,7 +203,7 @@ public static boolean Debug;
                             }
                         }
                     } else {
-                        
+
                         teleport(player1, player2, loc1, loc2);
 
                         player1.sendMessage(GREEN + "You have been swapped");
@@ -208,6 +220,8 @@ public static boolean Debug;
             }
         }.runTaskTimerAsynchronously(this, 0, 20);
     }
+    //This whole runnable runs asynchronously, minimizing workload of main thread
+    //but teleporting can't be done asynchronously, so i used next method to achieve both
 
     public void teleport(Player player1, Player player2, Location loc1, Location loc2){
         new BukkitRunnable(){
@@ -218,6 +232,8 @@ public static boolean Debug;
             }
         }.runTaskLater(this, 1);
     }
+    //piece of code i couldn't put into previous method,
+    //and had to make sure it runs synchronously
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -229,6 +245,7 @@ public static boolean Debug;
                 } else if (args.length == 1){
 
                     switch (args[0]) {
+                        //using switch statements instead of ifs and else ifs is faster
 
                         case "reload" : {
                             if (sender instanceof Player) {
@@ -330,6 +347,7 @@ public static boolean Debug;
         }
         return false;
     }
+    //this is just the command, nothing special here
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -358,5 +376,6 @@ public static boolean Debug;
         }
         return null;
     }
+    //TabCompleter, nothing special
 
 }
