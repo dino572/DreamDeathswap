@@ -69,7 +69,7 @@ public static boolean Debug;
     @EventHandler
     public void onNether(PlayerPortalEvent p){
         if (playerMap.containsKey(p.getPlayer()) || playerMap.containsValue(p.getPlayer())) {
-            
+
             if (!Nether) {
                 p.getPlayer().sendMessage(DARK_RED + "Nether has been disabled in the config");
                 p.setCancelled(true);
@@ -117,14 +117,14 @@ public static boolean Debug;
         return player;
     }
     /*
-    this method gets key from value of hashmap, however, this is not very optimized
+    this method gets key from value of HashMap, however, this is not very optimized
     because it loops through every online player and asks if he is the key
     optimally there would be two HashMaps, Key to Value and Value to Key
     but that also uses up twice the RAM
-    
-    aditionally, this will break if there are more keys holding the same value
+
+    additionally, this will break if there are more keys holding the same value
     */
-    
+
     public void fetchConfig(){
         Delay = getConfig().getInt("Delay");
         WarnTime = getConfig().getInt("WarnTime");
