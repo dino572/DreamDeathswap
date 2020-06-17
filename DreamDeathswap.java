@@ -370,7 +370,9 @@ public static boolean Debug;
                     for (Player p : Bukkit.getOnlinePlayers()){
                         if (!(playerMap.containsKey(p)) && !(playerMap.containsValue(p))) {
                             if (!(p.equals(sender))) {
-                                commands.add(p.getName());
+                                if (!(playerMap.containsKey((Player) sender)) && !(playerMap.containsValue((Player) sender))) {
+                                    commands.add(p.getName());
+                                }
                             }
                         }
                     }
@@ -385,3 +387,4 @@ public static boolean Debug;
     //TabCompleter, nothing special
 
 }
+
