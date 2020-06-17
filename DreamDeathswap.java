@@ -155,11 +155,11 @@ public static boolean Debug;
             int Time = 0;
 
             @Override
-            public void run(){
+            public void run() {
 
                 Time++;
 
-                if ( !(playerMap.containsKey(player1)) || !(playerMap.containsValue(player2)) ){
+                if (!(playerMap.containsKey(player1)) || !(playerMap.containsValue(player2))) {
                     cancel();
                 }
                 //cancels the runnable if one specified players isn't in HashMap
@@ -168,61 +168,63 @@ public static boolean Debug;
                     System.out.println("Time: " + Time);
                 }
 
-                if ((Delay - Time) <= WarnTime) {
-                    player1.sendMessage(translateAlternateColorCodes('&', "&cSwapping in " + (Delay - Time) + "&c seconds"));
-                    player2.sendMessage(translateAlternateColorCodes('&', "&cSwapping in " + (Delay - Time) + "&c seconds"));
-                    if (Delay - Time < 1) {
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 4F, 4F);
-                        player2.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 4F, 4F);
-                    } else {
-                        player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2F, 1F);
-                        player2.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2F, 1F);
+                if (!isCancelled()) {
+                    if ((Delay - Time) <= WarnTime) {
+                        player1.sendMessage(translateAlternateColorCodes('&', "&cSwapping in " + (Delay - Time) + "&c seconds"));
+                        player2.sendMessage(translateAlternateColorCodes('&', "&cSwapping in " + (Delay - Time) + "&c seconds"));
+                        if (Delay - Time < 1) {
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 4F, 4F);
+                            player2.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 4F, 4F);
+                        } else {
+                            player1.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2F, 1F);
+                            player2.playSound(player1.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2F, 1F);
+                        }
                     }
-                }
 
-                if (Delay - Time <= 0) {
+                    if (Delay - Time <= 0) {
 
-                    Location loc1 = player1.getLocation();
-                    Location loc2 = player2.getLocation();
-                    //saves locations before swapping
+                        Location loc1 = player1.getLocation();
+                        Location loc2 = player2.getLocation();
+                        //saves locations before swapping
 
-                    int rando = getRandomNumberInRange(0, 100);
-                    //calls to method of generating pseudorandom numbers above
+                        int rando = getRandomNumberInRange(0, 100);
+                        //calls to method of generating pseudorandom numbers above
 
-                    if (AlternativeMode) {
-                        //if AlternativeMode == true, it calculates with chances
+                        if (AlternativeMode) {
+                            //if AlternativeMode == true, it calculates with chances
 
-                        if (rando <= SwapChance) {
+                            if (rando <= SwapChance) {
+
+                                teleport(player1, player2, loc1, loc2);
+
+                                player1.sendMessage(GREEN + "You have been swapped");
+                                player2.sendMessage(GREEN + "You have been swapped");
+                                if (Debug) {
+                                    System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " rando: " + rando + " SwapChance: " + SwapChance);
+                                }
+                            } else {
+                                player1.sendMessage(GREEN + "Swapping did not occur");
+                                player2.sendMessage(GREEN + "Swapping did not occur");
+                                if (Debug) {
+                                    System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " rando: " + rando + " SwapChance: " + SwapChance);
+                                }
+                            }
+                        } else {
 
                             teleport(player1, player2, loc1, loc2);
 
                             player1.sendMessage(GREEN + "You have been swapped");
                             player2.sendMessage(GREEN + "You have been swapped");
                             if (Debug) {
-                                System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " rando: " + rando + " SwapChance: " + SwapChance);
-                            }
-                        } else {
-                            player1.sendMessage(GREEN + "Swapping did not occur");
-                            player2.sendMessage(GREEN + "Swapping did not occur");
-                            if (Debug) {
-                                System.out.print("loc1: " + loc1 + " loc2: " + loc2 + " rando: " + rando + " SwapChance: " + SwapChance);
+                                System.out.print("loc1: " + loc1 + " loc2: " + loc2);
                             }
                         }
-                    } else {
 
-                        teleport(player1, player2, loc1, loc2);
 
-                        player1.sendMessage(GREEN + "You have been swapped");
-                        player2.sendMessage(GREEN + "You have been swapped");
-                        if (Debug) {
-                            System.out.print("loc1: " + loc1 + " loc2: " + loc2);
-                        }
+                        Time = 0;
                     }
 
-
-                    Time = 0;
                 }
-
             }
         }.runTaskTimerAsynchronously(this, 0, 20);
     }
