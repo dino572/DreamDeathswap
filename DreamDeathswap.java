@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -25,14 +26,14 @@ import java.util.Random;
 
 public final class DreamDeathswap extends JavaPlugin implements Listener {
 
-HashMap<Player, Player> playerMap = new HashMap<>();
+    HashMap<Player, Player> playerMap = new HashMap<>();
 
-public static int Delay;
-public static int WarnTime;
-public static int SwapChance;
-public static boolean AlternativeMode;
-public static boolean Nether;
-public static boolean Debug;
+    public static int Delay;
+    public static int WarnTime;
+    public static int SwapChance;
+    public static boolean AlternativeMode;
+    public static boolean Nether;
+    public static boolean Debug;
 
     @Override
     public void onEnable() {
@@ -51,22 +52,7 @@ public static boolean Debug;
         saveConfig();
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent q){
-
-        Player left = q.getPlayer();
-
-        if (playerMap.containsValue(left)){
-            Player key = getKey(left);
-            playerMap.remove(key);
-        }
-
-        if (playerMap.containsKey(left)){
-            playerMap.remove(left);
-        }
-    }
-
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOW)
     public void onNether(PlayerPortalEvent p){
         if (playerMap.containsKey(p.getPlayer()) || playerMap.containsValue(p.getPlayer())) {
 
@@ -78,24 +64,24 @@ public static boolean Debug;
     }
     //this forbids players from entering Nether if it's disallowed
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGH)
     public void onDeath(PlayerDeathEvent d){
-            Player died = d.getEntity();
-            if (playerMap.containsKey(died)){
-                playerMap.get(died).sendMessage(DARK_GREEN + "You have won the deathswap!");
-                died.sendMessage(DARK_RED + "You have lost the deathswap!");
+        Player died = d.getEntity();
+        if (playerMap.containsKey(died)){
+            playerMap.get(died).sendMessage(DARK_GREEN + "You have won the deathswap!");
+            died.sendMessage(DARK_RED + "You have lost the deathswap!");
 
-                playerMap.remove(died);
-            }
+            playerMap.remove(died);
+        }
 
-            if (playerMap.containsValue(died)){
-                Player key = getKey(died);
+        if (playerMap.containsValue(died)){
+            Player key = getKey(died);
 
-                key.sendMessage(DARK_GREEN + "You have won the deathswap!");
-                died.sendMessage(DARK_RED + "You have lost the deathswap!");
+            key.sendMessage(DARK_GREEN + "You have won the deathswap!");
+            died.sendMessage(DARK_RED + "You have lost the deathswap!");
 
-                playerMap.remove(key);
-            }
+            playerMap.remove(key);
+        }
     }
     //declares winner and ends deathswap
 
@@ -111,23 +97,25 @@ public static boolean Debug;
     //just a method i found on the internet for getting random numbers
 
     public Player getKey(Player player){
-        try {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (playerMap.get(p).equals(player)) {
-                    return p;
+            try {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (playerMap.get(p).equals(player)) {
+                        return p;
+                    }
+                }
+            } catch (NullPointerException e) {
+                //just don't display it
+                if (Debug) {
+                    System.out.println("NullPointerException in getKey method");
                 }
             }
-        } catch (NullPointerException e){
-            //just don't display it
-        }
         return player;
     }
     /*
     this method gets key from value of HashMap, however, this is not very optimized
     because it loops through every online player and asks if he is the key
-    optimally there would be two HashMaps, Key to Value and Value to Key
+    Optimally, there would be two HashMaps, Key to Value and Value to Key
     but that also uses up twice the RAM
-
     additionally, this will break if there are more keys holding the same value
     */
 
@@ -145,8 +133,6 @@ public static boolean Debug;
 
     public void startRunnable(Player p1, Player p2){
 
-        playerMap.put(p1, p2);
-
         new BukkitRunnable(){
 
             Player player1 = p1;
@@ -159,10 +145,36 @@ public static boolean Debug;
 
                 Time++;
 
-                if (!(playerMap.containsKey(player1)) || !(playerMap.containsValue(player2))) {
-                    cancel();
+                if (!(playerMap.containsKey(player1)) || !(playerMap.containsValue(player2)) || !(player1.isOnline()) || !(player2.isOnline())) {
+                    if (!player1.isOnline()){
+                        player2.sendMessage(DARK_AQUA + "Other player in deathswap left the game");
+                        if (playerMap.containsKey(player1)){
+                            playerMap.remove(player1);
+                            cancel();
+                        } else if (playerMap.containsValue(player1)){
+                            Player key = getKey(player1);
+                            playerMap.remove(key);
+                            cancel();
+                        } else {
+                            cancel();
+                        }
+                    } else if (!player2.isOnline()){
+                        player1.sendMessage(DARK_AQUA + "Other player in deathswap left the game");
+                        if (playerMap.containsKey(player2)){
+                            playerMap.remove(player2);
+                            cancel();
+                        } else if (playerMap.containsValue(player2)){
+                            Player key = getKey(player2);
+                            playerMap.remove(key);
+                            cancel();
+                        } else {
+                            cancel();
+                        }
+                    } else {
+                        cancel();
+                    }
                 }
-                //cancels the runnable if one specified players isn't in HashMap
+                //cancels the runnable if one specified players isn't in HashMap or disconnected
 
                 if (Debug) {
                     System.out.println("Time: " + Time);
@@ -312,7 +324,9 @@ public static boolean Debug;
                                         if (!(Bukkit.getPlayer(args[0]).equals(sender))) {
                                             if (!(playerMap.containsKey(sender)) && !(playerMap.containsValue(sender))) {
                                                 if (!(playerMap.containsKey(Bukkit.getPlayer(args[0]))) && !(playerMap.containsValue(Bukkit.getPlayer(args[0])))) {
-                                                    startRunnable(((Player) sender), Bukkit.getPlayer(args[0]));
+
+                                                    playerMap.put(((Player) sender).getPlayer(), Bukkit.getPlayer(args[0]));
+                                                    startRunnable(((Player) sender).getPlayer(), Bukkit.getPlayer(args[0]));
 
                                                     sender.sendMessage(DARK_GREEN + "You have been put in deathswap");
                                                     Bukkit.getPlayer(args[0]).sendMessage(DARK_GREEN + "You have been put in deathswap");
@@ -389,4 +403,3 @@ public static boolean Debug;
     //TabCompleter, nothing special
 
 }
-
